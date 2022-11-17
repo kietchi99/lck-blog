@@ -1,81 +1,85 @@
-import { useState } from 'react'
-import styles from '../styles/Home.module.css'
-import Navbar from 'components/Navbar'
-import Footer from 'components/Footer'
-import CardList from 'components/CardList'
-import PostList from 'components/PostList'
-import TagList from 'components/TagList'
-import Top from 'components/Top'
-import Hero from 'components/Hero'
-import { CircularProgress } from 'components/Progress'
-import Filtering from 'components/Filtering'
-import { Box, Grid, Stack, Button, } from '@mui/material'
-import useSWR from 'swr'
-import { useGetBlogsPages } from 'action/pagination';
-import { getPaginatedBlogs, getNewBlogs, getAllTags} from 'lib/api';
+//sanity
+import { Box, Grid, Stack, Typography, styled} from '@mui/material'
 
-export default function Home({ blogs, newBlogs, tags }) {
-  const [filter, setFilter] = useState(0)
+// next
+import Link from 'next/link'
 
-  const handleFiltering = () => {
-    setFilter(+!filter)
-  }
+//components
+import Navbar from 'components/main/Navbar'
+import Footer from 'components/main/Footer'
+import PostList from 'components/post/PostList'
+import TagList from 'components/tags/TagList'
+import Hero from 'components/hero/Hero'
+import SmallCard from 'components/cards/SmallCard'
 
-  const { data, size, setSize, hitEnd, pending=false } = useGetBlogsPages();
-  const [loading, setLoading] = useState(false) 
+//hooks
+import { getNewBlogs, getAllTags, getBlogByCategory, getHero } from 'lib/sanity/queries/blogs';
 
-  const handleLoading = () => {
-    setLoading(true)
-  }
+const TypographyStyled = styled(Typography)(({theme})=>({
+  color: 'black',
+  fontWeight: '700',
+  "&:hover": {
+      color: theme.palette.primary.main,
+      cursor: "pointer"
+    } 
+  }))
+
+export default function Home({ tips, games, newBlogs, tags, hero}) {
   return (
     <>
-      <Navbar loading={loading}/>
+      <Navbar />
       <Box sx={{padding: '20px 20px 0 20px'}}>
-        <Hero items={data || [blogs]} loading={handleLoading}/>
-        <Box pt={2}>
-          <Filtering handleFiltering = {handleFiltering}/>
-        </Box>
-        <Grid container spacing={3}>
+        {hero.length > 0 && <Hero item={hero}/>}
+        <Grid container spacing={3} mt={4}>
           <Grid item xs={12} sm={12} md={8}>
-            <Stack justifyContent='center'>
-              <CardList loading={handleLoading} filter={filter} items={data || [blogs]}/>
-              <Box mt={4} sx={{display: 'flex', justifyContent: 'center'}}>
-                {
-                  pending
-                  ?<CircularProgress />
-                  :<Button 
-                    variant="contained" 
-                    disableElevation
-                    onClick={() => setSize(size + 1)}
-                    disabled={hitEnd}
-                  >
-                    Read more
-                  </Button>
-                }
+            <Box mb={3} p={2} sx={{borderRadius: '10px', background: 'white'}}>
+              <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
+                <Link href="/blogs/categories/games">
+                  <TypographyStyled>xem thêm</TypographyStyled>
+                </Link>
               </Box>
-            </Stack>
+              <Box>
+                <Grid container>
+                  {games.map(game=><Grid key={game.slug} item xs={6} sm={6} md={4}><SmallCard item={game}/></Grid>)}
+                </Grid>
+              </Box>
+            </Box>
+            <Box mb={3} p={2} sx={{borderRadius: '10px', background: 'white'}}>
+              <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
+                <Link href="/blogs/categories/tips">
+                  <TypographyStyled>xem thêm</TypographyStyled>
+                </Link>
+              </Box>
+              <Box>
+                <Grid container>
+                  {tips.map(tip=><Grid key={tip.slug} item xs={6} sm={6} md={4}><SmallCard item={tip}/></Grid>)}
+                </Grid>
+              </Box>
+            </Box>
           </Grid>
           <Grid item xs={12} sm={12} md={4}>
             <Stack spacing={5}>
-              <PostList items={newBlogs} loading={handleLoading}/>
+              <PostList items={newBlogs}/>
               <TagList items={tags}/> 
             </Stack>
           </Grid>
         </Grid>
       </Box>
       <Footer />
-      <Top />
     </>
   )
 }
 
 export async function getStaticProps() {
-  const blogs = await getPaginatedBlogs()
+  const games = await getBlogByCategory("game")
+  const tips = await getBlogByCategory("thu-thuat")
   const tags = await getAllTags()
   const newBlogs = await getNewBlogs()
+  const hero = await getHero()
+
   return {
     props: {
-      blogs, newBlogs, tags
+      newBlogs, tags, tips, games, hero
     }
   }
 }
