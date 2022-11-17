@@ -1,5 +1,5 @@
 import authenticate from '../../../../lib/auth/authenticate';
-import SanityEditClient from '../../../../lib/sanity/clients/SanityEditClient';
+import SanityEditClient from '../../../../lib/sanity/clients/sanityEditClient';
 import { deleteAComment } from '../../../../lib/sanity/mutations/comment';
 
 const commentHandler = (req, res) => {
