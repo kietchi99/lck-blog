@@ -46,6 +46,7 @@ const onBlogCreated = (req, res) => {
     .catch((err) => {
         console.log('💥 ERROR');
         console.error(err);
+        console.log(req.body)
 
         res.status(500).json({ status: 'error' });
     })
@@ -64,7 +65,7 @@ const onBlogDeleted = (req, res) => {
     .catch((err) => {
         console.log('💥 ERROR');
         console.error(err);
-
+         console.log(req.body)
         res.status(500).json({ status: 'error' });
     })
 }
