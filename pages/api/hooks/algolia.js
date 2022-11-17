@@ -28,8 +28,6 @@ const onBlogCreated = (req, res) => {
         subtitle,
         slug,
         coverimage,
-        category,
-        tags
     } = req.body;
 
   return index
@@ -38,9 +36,7 @@ const onBlogCreated = (req, res) => {
         title,
         subtitle,
         slug,
-        coverimage,
-        category,
-        tags
+        coverimage
     })
     .then(() => {
         console.log('✔ SUCCESS');
